@@ -29,7 +29,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}> 
       {/* Passando para tudo o que estiver no provider o tema especifico */}
-      <CategorySelect />
+      <Register />
     </ThemeProvider>
   );
 }

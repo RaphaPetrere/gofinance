@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
+
+import { useFocusEffect } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -54,15 +56,14 @@ export function Dashboard() {
         category: item.category
       }
     });
-    console.log(transactionsFormatted);
 
     setData(transactionsFormatted);
 
   }
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     loadTransaction();
-  }, [])
+  },[],));
   return (
     <Container>
       <Header>

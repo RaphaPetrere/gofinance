@@ -59,7 +59,6 @@ export function Register() {
   });
 
   const navigation = useNavigation<NavigationProps>();
-  const dataKey = '@gofinance:transactions';
 
   const {
     control,
@@ -81,13 +80,14 @@ export function Register() {
       id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
-      transactionType,
-      category: category.name,
+      type: transactionType,
+      category: category.key,
       date: new Date()
     }
     console.log(newTransaction);
 
     try {
+      const dataKey = '@gofinance:transactions';
       const asyncData = await AsyncStorage.getItem(dataKey);
       const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
       //Ao passar o !, ele assegura ao Typescript de que sempre irá ter um valor

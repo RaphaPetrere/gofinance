@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Keyboard, 
   Modal, 
@@ -9,6 +9,10 @@ import {
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
+import { useNavigation } from '@react-navigation/native';
 
 import { Button } from '../../components/Forms/Button';
 import { CategorySelectButton } from '../../components/Forms/CategorySelectButton';
@@ -40,6 +44,10 @@ const schema = Yup.object().shape({
     .required('O valor é obrigatório')
 });
 
+type NavigationProps = {
+  navigate: (screen:string) => void;
+}
+
 export function Register() {
   const [transactionType, setTransactionType] = useState('');
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -50,29 +58,61 @@ export function Register() {
     color: '#104312'
   });
 
+  const navigation = useNavigation<NavigationProps>();
+  const dataKey = '@gofinance:transactions';
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(schema) //faz a validação com base no schema.
   });
 
-  function handleRegister(form: FormData) {
+  async function handleRegister(form: FormData) {
     if(!transactionType)
       return Alert.alert('Selecione o tipo da transação');
 
     if(category.key === 'category')
       return Alert.alert('Selecione uma categoria');
 
-    const data = {
+    const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
       transactionType,
-      category: category.name
+      category: category.name,
+      date: new Date()
     }
-    console.log(data);
+    console.log(newTransaction);
+
+    try {
+      const asyncData = await AsyncStorage.getItem(dataKey);
+      const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
+      //Ao passar o !, ele assegura ao Typescript de que sempre irá ter um valor
+      const dataFormatted = [
+        ...newAsyncData,
+        newTransaction
+      ];
+      AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+
+      //Limpando o formulário inteiro
+      setTransactionType('');
+      setCategory({
+        key: 'category',
+        name: 'Categoria',
+        icon: 'any',
+        color: '#104312'
+      });
+      reset(); //Isso irá limpar o formulário
+      navigation.navigate('Listagem');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro', 'Não foi possível salvar');
+    }
   }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>

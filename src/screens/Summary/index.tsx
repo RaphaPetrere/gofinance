@@ -5,20 +5,30 @@ import {
   Header,
   Title,
   Content,
+  ChartContainer,
 } from './styles';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TransactionCardProps } from '../../components/TransactionCard';
 import { categories } from '../../utils/categories';
 
+import { useTheme } from 'styled-components';
+
+import { VictoryPie } from 'victory-native';
+import { RFValue } from 'react-native-responsive-fontsize';
+
 interface CategoryData {
   name: string;
+  totalNumber: number;
   total: string;
+  percent: string;
   color: string;
 }
 
 export function Summary() {
   const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>([]);
+
+  const theme = useTheme();
 
   const loadData = async() => {
     const dataKey = '@gofinance:transactions';
@@ -26,6 +36,10 @@ export function Summary() {
     const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
 
     const outcomes = newAsyncData.filter((outcome: TransactionCardProps) => outcome.type === 'outcome');
+
+    const totalOutcomes = outcomes.reduce((acumulator: number, outcome: TransactionCardProps) => {
+      return acumulator + Number(outcome.amount);
+    }, 0);
 
     const totalByCategory: CategoryData[] = [];
 
@@ -43,9 +57,13 @@ export function Summary() {
           style: 'currency',
           currency: 'BRL'
         })
+
+        const percent = `${(categorySum / totalOutcomes * 100).toFixed(0)}%`;
         totalByCategory.push({
           name: category.name,
+          totalNumber: categorySum,
           total,
+          percent,
           color: category.color,
         })
       }
@@ -65,6 +83,22 @@ export function Summary() {
       </Header>
 
       <Content>
+        <ChartContainer>
+          <VictoryPie 
+            data={totalByCategories}
+            colorScale={totalByCategories.map(category => category.color)}
+            style={{
+              labels: {
+                fontSize: RFValue(18),
+                fontWeight: 'bold',
+                fill: theme.colors.shape,
+              }
+            }}
+            labelRadius={50}
+            x='percent'
+            y='totalNumber'
+          />
+        </ChartContainer>
         {
           totalByCategories.map(item => 
             <HistoryCard 

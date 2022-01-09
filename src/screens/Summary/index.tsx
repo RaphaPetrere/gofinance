@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { HistoryCard } from '../../components/HistoryCard';
 import { 
   Container, 
   Header,
@@ -8,12 +7,15 @@ import {
   ChartContainer,
 } from './styles';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TransactionCardProps } from '../../components/TransactionCard';
+import { HistoryCard } from '../../components/HistoryCard';
+
 import { categories } from '../../utils/categories';
+import { filterTransactionByType, formatAmount, getTotalAmount } from '../../utils/functions';
 
 import { useTheme } from 'styled-components';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VictoryPie } from 'victory-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -35,11 +37,9 @@ export function Summary() {
     const asyncData = await AsyncStorage.getItem(dataKey);
     const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
 
-    const outcomes = newAsyncData.filter((outcome: TransactionCardProps) => outcome.type === 'outcome');
+    const outcomes = filterTransactionByType(newAsyncData, 'outcome');
 
-    const totalOutcomes = outcomes.reduce((acumulator: number, outcome: TransactionCardProps) => {
-      return acumulator + Number(outcome.amount);
-    }, 0);
+    const totalOutcomes = getTotalAmount(outcomes);
 
     const totalByCategory: CategoryData[] = [];
 
@@ -53,10 +53,7 @@ export function Summary() {
 
       if(categorySum > 0)
       {
-        const total = categorySum.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        })
+        const total = formatAmount(categorySum);
 
         const percent = `${(categorySum / totalOutcomes * 100).toFixed(0)}%`;
         totalByCategory.push({

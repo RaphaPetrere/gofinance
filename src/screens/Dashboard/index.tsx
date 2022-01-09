@@ -2,14 +2,6 @@ import React, { useCallback, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 
 import { useTheme } from 'styled-components';
-
-import { HighlightCard } from '../../components/HighlightCard';
-import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
-
-import { useFocusEffect } from '@react-navigation/native';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { 
   Container,
   Header,
@@ -27,6 +19,14 @@ import {
   LogoutButton,
   LoadContainer,
 } from './styles';
+
+import { filterTransactionByType, formatAmount, getTotalAmount } from '../../utils/functions';
+import { HighlightCard } from '../../components/HighlightCard';
+import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
+
+import { useFocusEffect } from '@react-navigation/native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface DataListProps extends TransactionCardProps {
   id: string;
@@ -51,7 +51,7 @@ export function Dashboard() {
   const theme = useTheme();
 
   const getLastTransactionDate = (transactionCollection: DataListProps[], type: 'income' | 'outcome') => {
-    const rawDate = transactionCollection.filter(item => item.type === type).pop()?.date;
+    const rawDate = filterTransactionByType(transactionCollection, type).pop()?.date;
     const tipos = {
       income: 'entrada',
       outcome: 'saída'
@@ -67,26 +67,14 @@ export function Dashboard() {
     const response = await AsyncStorage.getItem(dataKey);
     const asyncTransactions = response ? JSON.parse(response!) : [];
 
-    let incomesTotal = 0;
-    let outcomesTotal = 0;
-
     const transactionsFormatted: DataListProps[] = asyncTransactions.map((item: DataListProps) => {
-      const amount = Number(item.amount).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      });
+      const amount = formatAmount(Number(item.amount));
 
       const date = Intl.DateTimeFormat('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit'
       }).format(new Date(item.date));
-
-      if(item.type === 'income')
-        incomesTotal += Number(item.amount);
-      else
-        outcomesTotal += Number(item.amount);
-
 
       return {
         id: item.id,
@@ -99,28 +87,20 @@ export function Dashboard() {
     });
 
     setTransactions(transactionsFormatted);
+    const incomesTotal = getTotalAmount(filterTransactionByType(asyncTransactions, 'income'));
+    const outcomesTotal = getTotalAmount(filterTransactionByType(asyncTransactions, 'outcome'));
     const total = incomesTotal - outcomesTotal;
     setHighlightData({
       incomes: {
-        amount: incomesTotal.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
-        // amount: asyncTransactions.reduce((previousItem: DataListProps, item: DataListProps) => item.type === 'income' && previousItem.amount + item.amount),
+        amount: formatAmount(incomesTotal),
         lastTransaction: getLastTransactionDate(asyncTransactions, 'income')
       },
       outcomes: {
-        amount: outcomesTotal.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
+        amount: formatAmount(outcomesTotal),
         lastTransaction: getLastTransactionDate(asyncTransactions, 'outcome')
       },
       total: {
-        amount: total.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        }),
+        amount: formatAmount(total),
         lastTransaction: `1 à ${Intl.DateTimeFormat('pt-BR', {
           day: '2-digit',
           month: 'long'

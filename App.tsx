@@ -16,6 +16,7 @@ import { AppRoutes } from './src/routes/app.routes';
 
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
+import { StatusBar } from 'react-native';
 
 
 export default function App() {
@@ -32,6 +33,11 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}> 
+      <StatusBar 
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       {/* Passando para tudo o que estiver no provider o tema especifico */}
       <NavigationContainer>
         <AppRoutes />

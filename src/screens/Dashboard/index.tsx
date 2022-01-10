@@ -24,6 +24,7 @@ import { filterTransactionByType, formatAmount, getTotalAmount } from '../../uti
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -133,9 +134,11 @@ export function Dashboard() {
                   <UserName>Marilene</UserName>
                 </User>
               </UserInfo>
-              <LogoutButton onPress={() => {}}>
-                <Icon name='power' />
-              </LogoutButton>
+              <GestureHandlerRootView>
+                <LogoutButton onPress={() => {}}>
+                  <Icon name='power' />
+                </LogoutButton>
+              </GestureHandlerRootView>
             </UserWrapper>
           </Header>
 

@@ -15,7 +15,7 @@ import { Routes } from './src/routes';
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
 import { StatusBar } from 'react-native';
-import { AuthProvider } from './src/hooks/auth';
+import { AuthProvider, useAuth } from './src/hooks/auth';
 
 
 export default function App() {
@@ -25,7 +25,9 @@ export default function App() {
     Poppins_700Bold
   });
 
-  if(!fontsLoaded)
+  const { loadingUser } = useAuth();
+
+  if(!fontsLoaded || loadingUser)
   {
     return <AppLoading />
   }

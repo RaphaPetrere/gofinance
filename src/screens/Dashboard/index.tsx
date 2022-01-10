@@ -21,6 +21,7 @@ import {
 } from './styles';
 
 import { filterTransactionByType, formatAmount, getTotalAmount } from '../../utils/functions';
+import { useAuth } from '../../hooks/auth';
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
 
@@ -50,6 +51,7 @@ export function Dashboard() {
   const [highlightData, setHighlightData] = useState<HighlightCardData>({} as HighlightCardData);
 
   const theme = useTheme();
+  const { signOut, user } = useAuth();
 
   const getLastTransactionDate = (transactionCollection: DataListProps[], type: 'income' | 'outcome') => {
     const rawDate = filterTransactionByType(transactionCollection, type).pop()?.date;
@@ -127,15 +129,15 @@ export function Dashboard() {
             <UserWrapper>
               <UserInfo>
                 <Photo 
-                  source={{ uri: 'https://avatars.githubusercontent.com/u/56046074?v=4'}}
+                  source={{ uri: user.photo}}
                 />
                 <User>
-                  <UserGreeting>Olá, </UserGreeting>
-                  <UserName>Marilene</UserName>
+                  <UserGreeting>Olá,</UserGreeting>
+                  <UserName>{user.name}</UserName>
                 </User>
               </UserInfo>
               <GestureHandlerRootView>
-                <LogoutButton onPress={() => {}}>
+                <LogoutButton onPress={signOut}>
                   <Icon name='power' />
                 </LogoutButton>
               </GestureHandlerRootView>

@@ -20,8 +20,10 @@ interface User {
 
 interface AuthContextData {
   user: User;
+  loadingUser: boolean;
   signInWithGoogle(): Promise<void>;
   signInWithApple(): Promise<void>;
+  signOut(): Promise<void>;
 }
 
 interface AuthorizationResponse {
@@ -35,7 +37,7 @@ const AuthContext = createContext({} as AuthContextData);
 
 function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>({} as User);
-  // const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   const userStorageKey = '@gofinances:user';
 
@@ -81,7 +83,7 @@ function AuthProvider({ children }: AuthProviderProps) {
           id: String(credential.user),
           email: credential.email!,
           name: credential.fullName?.givenName!,
-          photo: undefined,
+          photo: `https://ui-avatars.com/api/?name=${credential.fullName?.givenName}&length=1`,
         }
         setUser(userLogged);
         await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
@@ -90,6 +92,11 @@ function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       throw new Error(error as string);
     }
+  }
+
+  async function signOut() {
+    setUser({} as User);
+    await AsyncStorage.removeItem(userStorageKey);
   }
 
   useEffect(() => {
@@ -101,6 +108,7 @@ function AuthProvider({ children }: AuthProviderProps) {
         const userLogged = JSON.parse(userStoraged) as User;
         setUser(userLogged);
       }
+      setLoadingUser(false);
     }
 
     loadUserStorageData();
@@ -109,8 +117,10 @@ function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider value={{
       user,
+      loadingUser,
       signInWithGoogle,
-      signInWithApple
+      signInWithApple,
+      signOut
     }}>
       { children }
     </AuthContext.Provider>

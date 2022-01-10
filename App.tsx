@@ -19,6 +19,7 @@ import { SignIn } from './src/screens/SignIn';
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
 import { StatusBar } from 'react-native';
+import { AuthProvider } from './src/hooks/auth';
 
 
 export default function App() {
@@ -42,7 +43,9 @@ export default function App() {
       />
       {/* Passando para tudo o que estiver no provider o tema especifico */}
       <NavigationContainer>
-        <SignIn />
+        <AuthProvider>
+          <SignIn />
+        </AuthProvider>
       </NavigationContainer>
     </ThemeProvider>
   );

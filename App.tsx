@@ -14,6 +14,8 @@ import theme from './src/global/styles/theme';
 import { NavigationContainer } from '@react-navigation/native';
 import { AppRoutes } from './src/routes/app.routes';
 
+import { SignIn } from './src/screens/SignIn';
+
 import 'intl';
 import 'intl/locale-data/jsonp/pt-BR';
 import { StatusBar } from 'react-native';
@@ -40,7 +42,7 @@ export default function App() {
       />
       {/* Passando para tudo o que estiver no provider o tema especifico */}
       <NavigationContainer>
-        <AppRoutes />
+        <SignIn />
       </NavigationContainer>
     </ThemeProvider>
   );

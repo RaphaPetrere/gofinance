@@ -1,4 +1,5 @@
 import React from 'react';
+import { Alert } from 'react-native';
 import {
   Container,
   Header,
@@ -17,7 +18,17 @@ import { useAuth } from '../../hooks/auth';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 export function SignIn() {
-  const { user } = useAuth();
+  const { signInWithGoogle } = useAuth();
+  
+  async function handleSignInWithGoogle(){
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Erro', 'Não foi possível conectar a conta Google');
+    }
+  }
+
   return (
     <Container>
       <Header>
@@ -45,6 +56,7 @@ export function SignIn() {
           <SignInSocialButton 
             title="Entrar com Google"
             svg={GoogleSvg}
+            onPress={handleSignInWithGoogle}
           />
           <SignInSocialButton 
             title="Entrar com Apple"

@@ -54,19 +54,27 @@ export function Dashboard() {
   const { signOut, user } = useAuth();
 
   const getLastTransactionDate = (transactionCollection: DataListProps[], type: 'income' | 'outcome') => {
-    const rawDate = filterTransactionByType(transactionCollection, type).pop()?.date;
+    const lastTransaction = filterTransactionByType(transactionCollection, type).pop();
     const tipos = {
       income: 'entrada',
       outcome: 'saída'
     };
-    return `Última ${tipos[type]} dia `+Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: 'long'
-    }).format(new Date(rawDate!))
+    if(lastTransaction)
+    {
+      const rawDate = new Date(lastTransaction.date);
+      return `Última ${tipos[type]} dia `+Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'long'
+      }).format(rawDate)
+    }
+    else
+    {
+      return `Não há transações de ${tipos[type]}`
+    }
   }
 
   const loadTransaction = async() => {
-    const dataKey = '@gofinance:transactions';
+    const dataKey = `@gofinance:transactions_user:${user.id}`;
     const response = await AsyncStorage.getItem(dataKey);
     const asyncTransactions = response ? JSON.parse(response!) : [];
 
@@ -107,7 +115,7 @@ export function Dashboard() {
         lastTransaction: `1 à ${Intl.DateTimeFormat('pt-BR', {
           day: '2-digit',
           month: 'long'
-        }).format(new Date(asyncTransactions.pop()?.date))}`
+        }).format(asyncTransactions ? new Date(asyncTransactions.pop().date) : new Date())}`
       },
     })
     setIsLoading(false);

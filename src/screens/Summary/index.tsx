@@ -19,6 +19,7 @@ import { HistoryCard } from '../../components/HistoryCard';
 import { categories } from '../../utils/categories';
 import { formatAmount, getTotalAmount } from '../../utils/functions';
 
+import { useAuth } from '../../hooks/auth';
 import { useTheme } from 'styled-components';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,6 +44,7 @@ export function Summary() {
   const [selectedDate, setSelectedData] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
 
+  const { user } = useAuth();
   const theme = useTheme();
 
   const handleDateChange = (action: 'prev' | 'next') => 
@@ -54,7 +56,7 @@ export function Summary() {
 
   const loadData = async() => {
     setIsLoading(true);
-    const dataKey = '@gofinance:transactions';
+    const dataKey = `@gofinance:transactions_user:${user.id}`;
     const asyncData = await AsyncStorage.getItem(dataKey);
     const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator, Alert, Platform } from 'react-native';
 import {
   Container,
   Header,
@@ -63,7 +63,13 @@ export function SignIn() {
 
         <SignInTitle>
           Faça seu login com {'\n'}
-          uma das contas abaixo
+          {
+            Platform.OS === 'ios' ?
+            'uma das contas '
+            :
+            'a conta '
+          }
+          abaixo
         </SignInTitle>
       </Header>
 
@@ -74,11 +80,14 @@ export function SignIn() {
             svg={GoogleSvg}
             onPress={handleSignInWithGoogle}
           />
-          <SignInSocialButton 
-            title="Entrar com Apple"
-            svg={AppleSvg}
-            onPress={handleSignInWithApple}
-          />
+          {
+            Platform.OS === 'ios' &&
+              <SignInSocialButton 
+                title="Entrar com Apple"
+                svg={AppleSvg}
+                onPress={handleSignInWithApple}
+              />
+          }
         </FooterWrapper>
 
         {isLoading && 

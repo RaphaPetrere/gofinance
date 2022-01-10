@@ -20,6 +20,7 @@ import { InputHookForm } from '../../components/Forms/InputHookForm';
 import { TransactionTypeButton } from '../../components/Forms/TransactionTypeButton';
 
 import { CategorySelect } from '../CategorySelect';
+import { useAuth } from '../../hooks/auth';
 
 import {
   Container,
@@ -58,6 +59,8 @@ export function Register() {
     color: '#104312'
   });
 
+  const { user } = useAuth();
+
   const navigation = useNavigation<NavigationProps>();
 
   const {
@@ -87,7 +90,7 @@ export function Register() {
     console.log(newTransaction);
 
     try {
-      const dataKey = '@gofinance:transactions';
+      const dataKey = `@gofinance:transactions_user:${user.id}`;
       const asyncData = await AsyncStorage.getItem(dataKey);
       const newAsyncData = asyncData ? JSON.parse(asyncData!) : [];
       //Ao passar o !, ele assegura ao Typescript de que sempre irá ter um valor

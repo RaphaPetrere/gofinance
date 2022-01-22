@@ -8,14 +8,18 @@ import {
 
 export const Profile = () => 
 <View>
-  <Text>Perfil</Text>
+  <Text testID='text-title'>Perfil</Text>
   <TextInput 
+    testID='input-name'
     placeholder='Nome'
     autoCorrect={false}
+    value="Raphael"
   />
 
   <TextInput 
+    testID='input-surname'
     placeholder='Sobrenome'
+    value="Petrére"
   />
 
   <Button 

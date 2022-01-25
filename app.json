@@ -14,7 +14,15 @@
     },
     "icon": "./assets/icon.png",
     "description": " A React Native app built with Typescript to control your finances",
-    "githubUrl": "https://github.com/RaphaPetrere/gofinance"
+    "githubUrl": "https://github.com/RaphaPetrere/gofinance",
+    "ios" : {
+      "bundleIdentifier": "com.gofinances",
+      "buildNumber": "1.0.0"
+    },
+    "android" : {
+      "package": "com.gofinances",
+      "versionCode": 1
+    }
   },
   "name": "gofinances"
 }
